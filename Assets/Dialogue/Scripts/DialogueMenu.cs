@@ -5,9 +5,9 @@ using TMPro;
 public class DialogueMenu : MonoBehaviour
 {
     [Header("UI References")]
-    public GameObject buttonPrefab; // A prefab for each dialogue option
-    public Transform buttonContainer; // Where buttons will appear
-    public Dialogue dialogueUI; // Reference to the main Dialogue script
+    public GameObject buttonPrefab;
+    public Transform buttonContainer;
+    public Dialogue dialogueUI;
 
     private DialogueInteract currentNPC;
 
@@ -16,22 +16,18 @@ public class DialogueMenu : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    // Called when player interacts with an NPC
     public void ShowOptions(DialogueInteract npc)
     {
         currentNPC = npc;
 
-        // Clear old buttons
         foreach (Transform child in buttonContainer)
-        {
             Destroy(child.gameObject);
-        }
 
-        // Create new buttons for unlocked dialogue options
         for (int i = 0; i < npc.dialogueOptions.Length; i++)
         {
             DialogueNode node = npc.dialogueOptions[i];
-            if (!node.unlocked) continue;
+
+            if (!npc.IsOptionAvailable(node)) continue;
 
             GameObject btnObj = Instantiate(buttonPrefab, buttonContainer);
             TextMeshProUGUI btnText = btnObj.GetComponentInChildren<TextMeshProUGUI>();

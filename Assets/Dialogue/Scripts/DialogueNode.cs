@@ -3,11 +3,10 @@ using UnityEngine;
 [System.Serializable]
 public class DialogueNode
 {
-    [TextArea(1, 2)]
-    public string question; // What the player clicks on (the dialogue option title)
-
+    public string question;            // Text shown on dialogue button
     [TextArea(3, 10)]
-    public string[] lines; // The NPC's response lines
+    public string[] lines;             // Dialogue that plays when selected
 
-    public bool unlocked = true; // Can be locked until triggered by event
+    public int requiredRound = 1;      // Appear when round >= this
+    public bool unlocked = true;       // Optional: can still be locked even if round reached
 }

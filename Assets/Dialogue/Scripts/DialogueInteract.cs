@@ -3,24 +3,23 @@ using UnityEngine;
 public class DialogueInteract : MonoBehaviour
 {
     [Header("NPC Info")]
-    public string characterName; // shows the name for the character on the dialogue UI
+    public string characterName;
 
     [Header("Dialogue Options")]
-    public DialogueNode[] dialogueOptions; // all the questions you can ask
+    public DialogueNode[] dialogueOptions;
 
     [Header("References")]
     public Dialogue dialogueUI;
 
     private bool isTalking = false;
 
-    // Initiates dialogue with the selected option index
-    public void Interact(int optionIndex = 0)
+    public void Interact(int optionIndex)
     {
         if (isTalking) return;
         if (optionIndex < 0 || optionIndex >= dialogueOptions.Length) return;
 
         DialogueNode node = dialogueOptions[optionIndex];
-        if (!node.unlocked) return;
+        if (!IsOptionAvailable(node)) return;
 
         isTalking = true;
 
@@ -30,7 +29,11 @@ public class DialogueInteract : MonoBehaviour
         dialogueUI.StartDialogue(() => { isTalking = false; });
     }
 
-    // Unlocks a dialogue option by its index
+    public bool IsOptionAvailable(DialogueNode node)
+    {
+        return GameManager.CurrentRound >= node.requiredRound && node.unlocked;
+    }
+
     public void UnlockOption(int index)
     {
         if (index >= 0 && index < dialogueOptions.Length)

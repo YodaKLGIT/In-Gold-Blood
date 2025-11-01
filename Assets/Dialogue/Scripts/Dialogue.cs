@@ -9,70 +9,46 @@ public class Dialogue : MonoBehaviour
     public TextMeshProUGUI characterNameComponent;
 
     [Header("Dialogue Settings")]
-    public float textSpeed = 0.05f;
+    public float textSpeed = 0.04f;
 
-    [HideInInspector] public string[] lines; // Set dynamically by DialogueInteract
+    [HideInInspector] public string[] lines;
     private int index;
     private Coroutine typingCoroutine;
     private System.Action onDialogueEnd;
 
-    void Start()
+    void OnEnable()
     {
-        // Hide text until activated by DialogueInteract
+        StartDialogue(null);
+    }
+
+    public void StartDialogue(System.Action onEnd)
+    {
+        index = 0;
         textComponent.text = string.Empty;
-        gameObject.SetActive(false);
+        onDialogueEnd = onEnd;
+        typingCoroutine = StartCoroutine(TypeLine());
     }
 
     void Update()
     {
-        if (!gameObject.activeSelf) return;
-
         if (Input.GetMouseButtonDown(0))
         {
-            // Skip typing animation
             if (textComponent.text == lines[index])
             {
                 NextLine();
             }
             else
             {
-                if (typingCoroutine != null)
-                    StopCoroutine(typingCoroutine);
+                StopCoroutine(typingCoroutine);
                 textComponent.text = lines[index];
             }
         }
-    }
-
-    public void StartDialogue(System.Action onEnd = null)
-    {
-        if (lines == null || lines.Length == 0)
-        {
-            Debug.LogWarning("Dialogue has no lines assigned!");
-            return;
-        }
-
-        onDialogueEnd = onEnd;
-        index = 0;
-        gameObject.SetActive(true);
-        textComponent.text = string.Empty;
-
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-
-        typingCoroutine = StartCoroutine(TypeLine());
     }
 
     IEnumerator TypeLine()
     {
         textComponent.text = string.Empty;
         string line = lines[index];
-
-        // 0 = instant typing
-        if (textSpeed <= 0f)
-        {
-            textComponent.text = line;
-            yield break;
-        }
 
         float delay = Mathf.Max(textSpeed, 0.01f);
 
@@ -88,24 +64,12 @@ public class Dialogue : MonoBehaviour
         if (index < lines.Length - 1)
         {
             index++;
-            if (typingCoroutine != null)
-                StopCoroutine(typingCoroutine);
-
             typingCoroutine = StartCoroutine(TypeLine());
         }
         else
         {
-            EndDialogue();
+            gameObject.SetActive(false);
+            onDialogueEnd?.Invoke();
         }
-    }
-
-    void EndDialogue()
-    {
-        if (typingCoroutine != null)
-            StopCoroutine(typingCoroutine);
-
-        textComponent.text = string.Empty;
-        gameObject.SetActive(false);
-        onDialogueEnd?.Invoke();
     }
 }

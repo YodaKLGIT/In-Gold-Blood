@@ -14,12 +14,13 @@ public class PlayerInteract : MonoBehaviour
         if (Input.GetKeyDown(interactKey))
         {
             TryInteract();
+            Debug.Log("Interact key pressed");
         }
     }
 
     void TryInteract()
     {
-        // Cast a short ray in front of the player to detect NPCs
+        Debug.Log("Attempting to interact");
         Ray ray = new Ray(transform.position, transform.forward);
         if (Physics.Raycast(ray, out RaycastHit hit, interactRange))
         {
